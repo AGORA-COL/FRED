@@ -781,13 +781,25 @@ void Epidemic::report_age_of_infection(int day) {
   int young12_Cs = 0;
   int older12_Cs = 0;
   int age_count_Cs[Demographics::MAX_AGE + 1];				// age group counts
+
+  int infants_Chosp = 0;
+  int toddlers_Chosp = 0;
+  int pre_school_Chosp = 0;
+  int elementary_Chosp = 0;
+  int high_school_Chosp = 0;
+  int young_adults_Chosp = 0;
+  int adults_Chosp = 0;
+  int elderly_Chosp = 0;
+  int age_count_Chosp[Demographics::MAX_AGE + 1];				// age group counts
   
   double mean_age = 0.0;
   int count_infections = 0;
   int count_symptomatics = 0;
+  int count_Chosp = 0;
   for(int i = 0; i <= Demographics::MAX_AGE; ++i) {
     age_count[i] = 0;
     age_count_Cs[i] = 0;
+    age_count_Chosp[i] = 0;
   }
   // Add symptomatics to this list
   
@@ -943,6 +955,77 @@ void Epidemic::report_age_of_infection(int day) {
       }
     }
   }
+
+printf("Epidemic.cc::report_age_of_infection -> There are %d symptomatics, %lu\n", this->people_becoming_hospitalized_today, this->daily_hospitalization_list.size());
+for(int i = 0; i < this->people_becoming_hospitalized_today; ++i) {    
+    Person* infectee = this->daily_hospitalization_list[i];
+    
+    int age = infectee->get_age();
+    count_Chosp++;
+    
+    int age_group = age / 5;
+    if(age_group > 20) {
+      age_group = 20;
+    }
+    if(Global::Report_Age_Of_Infection > 3) {
+      age_group = age;
+      if(age_group > Demographics::MAX_AGE) {
+        age_group = Demographics::MAX_AGE;
+      }
+    }
+
+    age_count_Chosp[age_group]++;
+    double real_age = infectee->get_real_age();
+    if(Global::Report_Age_Of_Infection == 1) {
+      if(real_age < 0.5) {
+        infants_Chosp++;
+      } else if(real_age < 2.0) {
+        toddlers_Chosp++;
+      } else if(real_age < 6.0) {
+        pre_school_Chosp++;
+      } else if(real_age < 12.0) {
+        elementary_Chosp++;
+      } else if(real_age < 18.0) {
+        high_school_Chosp++;
+      } else if(real_age < 21.0) {
+        young_adults_Chosp++;
+      } else if(real_age < 65.0) {
+        adults_Chosp++;
+      } else if(65 <= real_age) {
+        elderly_Chosp++;
+      }
+    } else if (Global::Report_Age_Of_Infection == 2) {
+      if(real_age < 19.0/12.0) {
+        infants_Chosp++;
+      } else if(real_age < 3.0) {
+        toddlers_Chosp++;
+      } else if(real_age < 5.0) {
+        pre_school_Chosp++;
+      } else if(real_age < 12.0) {
+        elementary_Chosp++;
+      } else if(real_age < 18.0) {
+        high_school_Chosp++;
+      } else if(real_age < 21.0) {
+        young_adults_Chosp++;
+      } else if(real_age < 65.0) {
+        adults_Chosp++;
+      } else if(65 <= real_age) {
+        elderly_Chosp++;
+      }
+    } else if(Global::Report_Age_Of_Infection == 3) {
+      if(real_age < 5.0) {
+        pre_school_Chosp++;
+      } else if(real_age < 18.0) {
+        high_school_Chosp++;
+      } else if(real_age < 50.0) {
+        young_adults_Chosp++;
+      } else if(real_age < 65.0) {
+        adults_Chosp++;
+      } else if(65 <= real_age) {
+        elderly_Chosp++;
+      }
+    }
+  }
   
   if(count_infections > 0) {
     mean_age /= count_infections;
@@ -979,6 +1062,16 @@ void Epidemic::report_age_of_infection(int day) {
     track_value(day, (char*)"Young_adults_Cs", young_adults_Cs);
     track_value(day, (char*)"Adults_Cs", adults_Cs);
     track_value(day, (char*)"Elderly_Cs", elderly_Cs);
+
+    track_value(day, (char*)"Infants_Chosp", infants_Chosp);
+    track_value(day, (char*)"Toddlers_Chosp", toddlers_Chosp);
+    track_value(day, (char*)"Preschool_Chosp", pre_school_Chosp);
+    track_value(day, (char*)"Students_Chosp", elementary_Chosp+high_school_Chosp);
+    track_value(day, (char*)"Elementary_Chosp", elementary_Chosp);
+    track_value(day, (char*)"Highschool_Chosp", high_school_Chosp);
+    track_value(day, (char*)"Young_adults_Chosp", young_adults_Chosp);
+    track_value(day, (char*)"Adults_Chosp", adults_Chosp);
+    track_value(day, (char*)"Elderly_Chosp", elderly_Chosp);
     break;
   case 2:
     track_value(day, (char*)"Infants", infants);
@@ -998,6 +1091,15 @@ void Epidemic::report_age_of_infection(int day) {
     track_value(day, (char*)"Young_adults_Cs", young_adults_Cs);
     track_value(day, (char*)"Adults_Cs", adults_Cs);
     track_value(day, (char*)"Elderly_Cs", elderly_Cs);
+
+    track_value(day, (char*)"Infants_Chosp", infants_Chosp);
+    track_value(day, (char*)"Toddlers_Chosp", toddlers_Chosp);
+    track_value(day, (char*)"Pre-k_Chosp", pre_school_Chosp);
+    track_value(day, (char*)"Elementary_Chosp", elementary_Chosp);
+    track_value(day, (char*)"Highschool_Chosp", high_school_Chosp);
+    track_value(day, (char*)"Young_adults_Chosp", young_adults_Chosp);
+    track_value(day, (char*)"Adults_Chosp", adults_Chosp);
+    track_value(day, (char*)"Elderly_Chosp", elderly_Chosp);
     break;
   case 3:
     track_value(day, (char*)"0_4", pre_school);
@@ -1011,6 +1113,12 @@ void Epidemic::report_age_of_infection(int day) {
     track_value(day, (char*)"18_49_Cs", young_adults_Cs);
     track_value(day, (char*)"50_64_Cs", adults_Cs);
     track_value(day, (char*)"65_up_Cs", elderly_Cs);
+
+    track_value(day, (char*)"0_4_Chosp", pre_school_Chosp);
+    track_value(day, (char*)"5_17_Chosp", high_school_Chosp);
+    track_value(day, (char*)"18_49_Chosp", young_adults_Chosp);
+    track_value(day, (char*)"50_64_Chosp", adults_Chosp);
+    track_value(day, (char*)"65_up_Chosp", elderly_Chosp);
     break;
   case 4:
     for(int i = 0; i <= Demographics::MAX_AGE; ++i) {
@@ -1019,6 +1127,8 @@ void Epidemic::report_age_of_infection(int day) {
       track_value(day, temp_str, age_count[i]);
       sprintf(temp_str, "ACs%d", i);
       track_value(day, temp_str, age_count_Cs[i]);
+      sprintf(temp_str, "Chosp%d", i);
+      track_value(day, temp_str, age_count_Chosp[i]);
       sprintf(temp_str, "Age%d", i);
       track_value(day, temp_str,
 		  Global::Popsize_by_age[i] ?
